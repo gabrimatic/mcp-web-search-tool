@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "mcp-web-search": {
+      "command": "node",
+      "args": [
+        "/Users/soroush/Develop/projects/mcp/build/index.js"
+      ]
+    }
+  }
+}

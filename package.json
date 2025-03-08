@@ -1,0 +1,62 @@
+{
+  "name": "mcp-web-search-tool",
+  "version": "1.0.0",
+  "description": "MCP Web Search Tool - A Model Context Protocol server that provides web search capabilities",
+  "private": false,
+  "type": "module",
+  "bin": {
+    "mcp-web-search": "./build/index.js"
+  },
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
+    "prepare": "npm run build",
+    "watch": "tsc --watch",
+    "inspector": "npx @modelcontextprotocol/inspector build/index.js",
+    "start": "node build/index.js",
+    "dev": "nodemon --exec \"npx ts-node\" src/index.ts",
+    "test": "npm run build && npx ts-node test/manual-test.ts",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "web-search",
+    "brave-search",
+    "ai-tools"
+  ],
+  "author": "Hossein Yousefpour <h.yusefpour@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrimatic/mcp-web-search-tool.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gabrimatic/mcp-web-search-tool/issues"
+  },
+  "homepage": "https://github.com/gabrimatic/mcp-web-search-tool#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "0.6.0",
+    "dotenv": "^16.4.7",
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "@types/node-fetch": "^2.6.12",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  }
+}
