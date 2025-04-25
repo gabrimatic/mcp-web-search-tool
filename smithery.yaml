@@ -1,0 +1,37 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required:
+      - braveApiKey
+    properties:
+      braveApiKey:
+        type: string
+        description: Brave Search API key
+      maxResults:
+        type: number
+        default: 10
+        description: Maximum number of search results
+      requestTimeout:
+        type: number
+        default: 10000
+        description: Request timeout in milliseconds
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => ({
+      command: 'node',
+      args: ['build/index.js'],
+      env: {
+        BRAVE_API_KEY: config.braveApiKey,
+        MAX_RESULTS: String(config.maxResults ?? 10),
+        REQUEST_TIMEOUT: String(config.requestTimeout ?? 10000)
+      }
+    })
+  exampleConfig:
+    braveApiKey: YOUR_BRAVE_API_KEY
+    maxResults: 10
+    requestTimeout: 10000
