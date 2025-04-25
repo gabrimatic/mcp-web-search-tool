@@ -1,4 +1,5 @@
 # MCP Web Search Tool
+[![smithery badge](https://smithery.ai/badge/@gabrimatic/mcp-web-search-tool)](https://smithery.ai/server/@gabrimatic/mcp-web-search-tool)
 
 A powerful Model Context Protocol (MCP) server providing real-time web search capabilities through pluggable search providers. Currently integrated with the [Brave Search API](https://api-dashboard.search.brave.com/app/documentation/web-search/get-started).
 
@@ -18,6 +19,14 @@ A powerful Model Context Protocol (MCP) server providing real-time web search ca
 - **Brave Search API Key**: Required for accessing the Brave Search API
 
 ## 🚀 Installation
+
+### Installing via Smithery
+
+To install Web Search Tool for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@gabrimatic/mcp-web-search-tool):
+
+```bash
+npx -y @smithery/cli install @gabrimatic/mcp-web-search-tool --client claude
+```
 
 1. **Clone the Repository**:
    ```bash
