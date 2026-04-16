@@ -1,4 +1,5 @@
 import { BraveSearchProvider } from './BraveSearchProvider.js';
+import { TavilySearchProvider } from './TavilySearchProvider.js';
 import { SearchProvider, SearchProviderConfig } from './SearchProvider.js';
 
 export class SearchProviderFactory {
@@ -64,5 +65,14 @@ export class SearchProviderFactory {
     const brave = new BraveSearchProvider();
     brave.initialize(config);
     this.add(brave, true);
+  }
+
+  /**
+   * Setup with Tavily Search (convenience method)
+   */
+  static setupTavilySearch(config: SearchProviderConfig): void {
+    const tavily = new TavilySearchProvider();
+    tavily.initialize(config);
+    this.add(tavily);
   }
 }
