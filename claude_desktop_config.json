@@ -2,7 +2,12 @@
   "mcpServers": {
     "mcp-web-search": {
       "command": "node",
-      "args": ["/path/to/mcp-web-search-tool/build/index.js"]
+      "args": ["/path/to/mcp-web-search-tool/build/index.js"],
+      "env": {
+        "BRAVE_API_KEY": "your-brave-api-key",
+        "TAVILY_API_KEY": "your-tavily-api-key",
+        "SEARCH_PROVIDER": "brave"
+      }
     },
     "memory": {
       "command": "docker",

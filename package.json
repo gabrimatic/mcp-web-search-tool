@@ -40,6 +40,7 @@
   "homepage": "https://github.com/gabrimatic/mcp-web-search-tool#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "0.6.0",
+    "@tavily/core": "^0.6.1",
     "dotenv": "^16.4.7",
     "node-fetch": "^2.7.0"
   },

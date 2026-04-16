@@ -33,10 +33,29 @@ const searchConfig: SearchProviderConfig = {
 };
 
 /**
- * Initialize with Brave Search
- * Setup a new search provider later here if needed (e.g. Google, Bing, etc.)
+ * Initialize with Brave Search (if API key is present)
  */
-SearchProviderFactory.setupBraveSearch(searchConfig);
+if (appConfig.search.apiKey) {
+  SearchProviderFactory.setupBraveSearch(searchConfig);
+}
+
+/**
+ * Initialize with Tavily Search (if API key is present)
+ */
+if (appConfig.tavilySearch.apiKey) {
+  SearchProviderFactory.setupTavilySearch({
+    apiKey: appConfig.tavilySearch.apiKey,
+    maxResults: appConfig.tavilySearch.maxResults,
+    timeout: appConfig.tavilySearch.timeout,
+  });
+}
+
+/**
+ * Set default provider based on SEARCH_PROVIDER env var
+ */
+if (appConfig.searchProvider === 'tavily') {
+  SearchProviderFactory.setDefault('tavily');
+}
 
 /**
  * Categories of queries that require real-time data

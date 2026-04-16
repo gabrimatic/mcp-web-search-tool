@@ -31,11 +31,22 @@ export interface SearchConfig {
 }
 
 /**
+ * Tavily search configuration
+ */
+export interface TavilySearchConfig {
+    apiKey: string;
+    maxResults: number;
+    timeout: number;
+}
+
+/**
  * Application configuration
  */
 export interface AppConfig {
     server: ServerConfig;
     search: SearchConfig;
+    tavilySearch: TavilySearchConfig;
+    searchProvider: string;
 }
 
 /**
@@ -45,7 +56,16 @@ export interface AppConfig {
  * @throws Error if configuration is invalid
  */
 function validateConfig(config: AppConfig): void {
-    if (!config.search.apiKey) {
+    const provider = config.searchProvider;
+
+    if (provider === 'tavily' && !config.tavilySearch.apiKey) {
+        throw new Error(
+            'TAVILY_API_KEY environment variable is not set. ' +
+            'Please create a .env file in the project root with your Tavily API key.'
+        );
+    }
+
+    if (provider !== 'tavily' && !config.search.apiKey) {
         throw new Error(
             'BRAVE_API_KEY environment variable is not set. ' +
             'Please create a .env file in the project root with your API key.'
@@ -70,7 +90,13 @@ export function loadConfig(): AppConfig {
             apiKey: process.env.BRAVE_API_KEY || '',
             maxResults: Number(process.env.MAX_RESULTS) || 10,
             timeout: Number(process.env.REQUEST_TIMEOUT) || 10000,
-        }
+        },
+        tavilySearch: {
+            apiKey: process.env.TAVILY_API_KEY || '',
+            maxResults: Number(process.env.MAX_RESULTS) || 10,
+            timeout: Number(process.env.REQUEST_TIMEOUT) || 10000,
+        },
+        searchProvider: process.env.SEARCH_PROVIDER || 'brave',
     };
 
     // Validate the configuration
