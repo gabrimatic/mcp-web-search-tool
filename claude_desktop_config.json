@@ -2,8 +2,51 @@
   "mcpServers": {
     "mcp-web-search": {
       "command": "node",
+      "args": ["/path/to/mcp-web-search-tool/build/index.js"]
+    },
+    "memory": {
+      "command": "docker",
+      "args": ["run", "-i", "-v", "claude-memory:/app/dist", "--rm", "mcp/memory"]
+    },
+    "git": {
+      "command": "docker",
       "args": [
-        "/Users/soroush/Develop/projects/mcp/build/index.js"
+        "run",
+        "--rm",
+        "-i",
+        "--mount",
+        "type=bind,src=/path/to/projects,dst=/path/to/projects",
+        "mcp/git"
+      ]
+    },
+    "postgres": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "mcp/postgres",
+        "postgresql://USER:PASSWORD@host.docker.internal:PORT/DATABASE"
+      ]
+    },
+    "time": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "mcp/time"]
+    },
+    "sequentialthinking": {
+      "command": "docker",
+      "args": ["run", "--rm", "-i", "mcp/sequentialthinking"]
+    },
+    "filesystem": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "--mount",
+        "type=bind,src=/path/to/projects,dst=/projects",
+        "mcp/filesystem",
+        "/projects"
       ]
     }
   }
