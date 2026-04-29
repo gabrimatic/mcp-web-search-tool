@@ -1,6 +1,6 @@
 # MCP Web Search Tool
 
-An [MCP](https://modelcontextprotocol.io) server that lets your assistant search the live web, read full pages, and cite sources. Stdio transport, pluggable providers, no scrapers in your dependency tree.
+An [MCP](https://modelcontextprotocol.io) server that gives an assistant live web search, full-page reading, and source citations. Stdio transport, pluggable providers, no scraper dependencies.
 
 ![Claude Desktop Example](banner.png)
 
@@ -12,9 +12,9 @@ An [MCP](https://modelcontextprotocol.io) server that lets your assistant search
 
 ---
 
-## TL;DR
+## Overview
 
-You get five tools: `web_search`, `news_search`, `image_search`, `fetch_url`, `list_providers`. Search returns ranked summaries with stable ids; `fetch_url` reads the page behind any id. Brave Search is the primary provider; DuckDuckGo runs without a key as a fallback.
+Five tools: `web_search`, `news_search`, `image_search`, `fetch_url`, `list_providers`. Search returns ranked summaries with stable ids; `fetch_url` reads the page behind any id. Brave Search is the primary provider; DuckDuckGo runs without a key as a fallback.
 
 ## Requirements
 
@@ -22,7 +22,7 @@ You get five tools: `web_search`, `news_search`, `image_search`, `fetch_url`, `l
 |---|---|
 | **Node.js** | `>= 20.18` (uses native `fetch`) |
 | **npm** | `>= 10` |
-| **Brave Search API key** | optional. Without it, DuckDuckGo handles `web_search`. `news_search` and `image_search` need a key. |
+| **Brave Search API key** | optional. Without it, DuckDuckGo handles `web_search`. `news_search` and `image_search` require a key. |
 
 ## Quick start
 
@@ -35,20 +35,20 @@ npm run build
 npm start
 ```
 
-Run with Docker instead:
+Run with Docker:
 
 ```bash
 docker build -t mcp-web-search .
 docker run --rm -i -e BRAVE_API_KEY mcp-web-search
 ```
 
-Wire it into Claude Desktop, Claude Code, Codex, VS Code, Cursor, or Windsurf: see [`MCP_CLIENTS.md`](./MCP_CLIENTS.md).
+For Claude Desktop, Claude Code, Codex, VS Code, Cursor, or Windsurf integration, see [`MCP_CLIENTS.md`](./MCP_CLIENTS.md).
 
 ---
 
 ## Tools
 
-Every tool returns two content blocks: a Markdown rendering for the model and a fenced JSON block with the structured payload. Errors come back as `isError: true` content with an actionable message; only unknown-tool calls throw a protocol error.
+Each tool returns two content blocks: a Markdown rendering for the model and a fenced JSON block with the structured payload. Errors come back as `isError: true` content with an actionable message; only unknown-tool calls throw a protocol error.
 
 ### `web_search`
 
@@ -114,7 +114,7 @@ All configuration is environment-driven. Reference: [`.env.example`](./.env.exam
 
 ---
 
-## How it fits together
+## Project layout
 
 ```
 src/
@@ -179,28 +179,28 @@ CI runs on Node 20, 22, and 24, plus a Docker image build. Tests cover the LRU+T
 
 ---
 
-## 📜 License
+## License
 
 [MIT License](LICENSE)
 
-## 👨‍💻 Developer
+## Developer
 
 By [Soroush Yousefpour](https://gabrimatic.info "Soroush Yousefpour")
 
 &copy; All rights reserved.
 
-## 🎥 YouTube Video
+## YouTube Video
 
-Watch the MCP Web Search Tool in action with Claude:
+A short demo of MCP Web Search Tool with Claude:
 
-📺 [Claude + MCP Web Search – Live Demo](https://youtu.be/6jAnjJSCL30?si=4n0-NtTyG_3SVaFh)
+[Claude + MCP Web Search – Live Demo](https://youtu.be/6jAnjJSCL30?si=4n0-NtTyG_3SVaFh)
 
-## 📝 Medium Article
+## Medium Article
 
-Read more about the MCP Web Search Tool, its capabilities, and how it enhances AI-driven web search:
+Background on the project and how it works:
 
-📖 [Deep Dive into MCP Web Search Tool](https://medium.com/@gabrimatic/introducing-mcp-web-search-tool-bridging-ai-assistants-to-real-time-web-information-5df9ab92ad02)
+[Deep Dive into MCP Web Search Tool](https://medium.com/@gabrimatic/introducing-mcp-web-search-tool-bridging-ai-assistants-to-real-time-web-information-5df9ab92ad02)
 
-## ☕ Support
+## Support
 
 <a href="https://www.buymeacoffee.com/gabrimatic" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Book" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
