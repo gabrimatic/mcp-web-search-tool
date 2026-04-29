@@ -6,7 +6,7 @@ An [MCP](https://modelcontextprotocol.io) server that lets your assistant search
 
 [![CI](https://github.com/gabrimatic/mcp-web-search-tool/actions/workflows/ci.yml/badge.svg)](https://github.com/gabrimatic/mcp-web-search-tool/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Node](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen)](https://nodejs.org)
+[![Node](https://img.shields.io/badge/node-%3E%3D20.18-brightgreen)](https://nodejs.org)
 
 [Quick start](#quick-start) · [Tools](#tools) · [Configuration](#configuration) · [Clients](./MCP_CLIENTS.md) · [Security](./SECURITY.md) · [Changelog](./CHANGELOG.md)
 
@@ -20,8 +20,8 @@ You get five tools: `web_search`, `news_search`, `image_search`, `fetch_url`, `l
 
 | | |
 |---|---|
-| **Node.js** | `>= 18.17` (uses native `fetch`) |
-| **npm** | `>= 9` |
+| **Node.js** | `>= 20.18` (uses native `fetch`) |
+| **npm** | `>= 10` |
 | **Brave Search API key** | optional. Without it, DuckDuckGo handles `web_search`. `news_search` and `image_search` need a key. |
 
 ## Quick start
@@ -166,7 +166,7 @@ npm run format
 npm run build
 ```
 
-CI runs on Node 18, 20, and 22, plus a Docker image build. Tests cover the LRU+TTL cache, HTML extractor, DuckDuckGo parser, search-service caching, HTTP retry/backoff, SSRF guard, domain match, and the result-id resolver.
+CI runs on Node 20, 22, and 24, plus a Docker image build. Tests cover the LRU+TTL cache, HTML extractor, DuckDuckGo parser, search-service caching, HTTP retry/backoff, SSRF guard, domain match, and the result-id resolver.
 
 ---
 
