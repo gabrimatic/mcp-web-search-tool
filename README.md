@@ -115,7 +115,7 @@ The tool automatically categorizes queries into:
 [MIT License](LICENSE)
 
 ## 👨‍💻 Developer
-By [Hossein Yousefpour](https://gabrimatic.info "Hossein Yousefpour")
+By [Soroush Yousefpour](https://gabrimatic.info "Soroush Yousefpour")
 
 &copy; All rights reserved.
 
