@@ -1,11 +1,11 @@
 import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import { SearchProviderFactory } from '../providers/SearchProviderFactory.js';
-import { SearchOptions, SearchResponse } from '../providers/SearchProvider.js';
+import type { SearchOptions, SearchResponse } from '../providers/SearchProvider.js';
 import { LruCache } from '../utils/cache.js';
 
 const cache = new LruCache<SearchResponse>(
   Number(process.env.CACHE_MAX_ENTRIES) || 256,
-  Number(process.env.CACHE_TTL_MS) || 5 * 60 * 1000,
+  Number(process.env.CACHE_TTL_MS) || 5 * 60 * 1000
 );
 
 function cacheKey(provider: string, query: string, opts: SearchOptions): string {
@@ -15,11 +15,9 @@ function cacheKey(provider: string, query: string, opts: SearchOptions): string 
     .filter(([, v]) => v !== undefined && v !== null)
     .map(([k, v]) => [k, Array.isArray(v) ? [...v].sort() : v] as const)
     .sort(([a], [b]) => a.localeCompare(b));
-  return [
-    provider.toLowerCase(),
-    query.trim().toLowerCase(),
-    JSON.stringify(sortedEntries),
-  ].join('|');
+  return [provider.toLowerCase(), query.trim().toLowerCase(), JSON.stringify(sortedEntries)].join(
+    '|'
+  );
 }
 
 export class SearchService {
@@ -34,7 +32,7 @@ export class SearchService {
   static async searchWith(
     query: string,
     providerName: string | undefined,
-    options: SearchOptions = {},
+    options: SearchOptions = {}
   ): Promise<SearchResponse> {
     try {
       const provider = providerName

@@ -9,7 +9,7 @@ const BLOCK_REPLACE: Array<[RegExp, string]> = [
   [/<\s*br\s*\/?\s*>/gi, '\n'],
   [/<\s*\/p\s*>/gi, '\n\n'],
   [/<\s*\/(div|section|article|li|tr|h[1-6])\s*>/gi, '\n'],
-  [/<\s*li[^>]*>/gi, '- '],
+  [/<\s*li[^>]*>/gi, '- ']
 ];
 
 const STRIP_BLOCKS = [
@@ -23,7 +23,7 @@ const STRIP_BLOCKS = [
   'footer',
   'header',
   'aside',
-  'form',
+  'form'
 ];
 
 export interface ExtractedPage {
@@ -59,7 +59,10 @@ export function extractReadable(html: string, opts: { maxChars?: number } = {}):
   for (const [re, repl] of BLOCK_REPLACE) work = work.replace(re, repl);
   let text = stripTags(work);
   text = decodeEntities(text);
-  text = text.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+  text = text
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 
   if (text.length > maxChars) text = text.slice(0, maxChars).trimEnd() + '…';
 

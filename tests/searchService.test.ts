@@ -1,9 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  SearchOptions,
-  SearchProvider,
-  SearchResponse,
-} from '../src/providers/SearchProvider.js';
+import { SearchOptions, SearchProvider, SearchResponse } from '../src/providers/SearchProvider.js';
 import { SearchProviderFactory } from '../src/providers/SearchProviderFactory.js';
 import { SearchService } from '../src/services/SearchService.js';
 
@@ -21,7 +17,7 @@ class StubProvider extends SearchProvider {
       query,
       provider: this.getName(),
       kind: 'web',
-      results: [{ title: 'r', url: 'https://x', description: 'd' }],
+      results: [{ title: 'r', url: 'https://x', description: 'd' }]
     };
   }
 }

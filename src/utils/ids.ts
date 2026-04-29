@@ -10,7 +10,7 @@ import { LruCache } from './cache.js';
  */
 const idStore = new LruCache<string>(
   Number(process.env.RESULT_ID_CACHE_MAX) || 2_000,
-  Number(process.env.RESULT_ID_TTL_MS) || 60 * 60 * 1000, // 1 hour
+  Number(process.env.RESULT_ID_TTL_MS) || 60 * 60 * 1000 // 1 hour
 );
 
 const ID_PREFIX = 'r_';

@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import type { CallToolRequest } from '@modelcontextprotocol/sdk/types.js';
 import {
-  CallToolRequest,
   CallToolRequestSchema,
   ErrorCode,
   ListToolsRequestSchema,
-  McpError,
+  McpError
 } from '@modelcontextprotocol/sdk/types.js';
 
 import { appConfig } from './config.js';
 import { SearchProviderFactory } from './providers/SearchProviderFactory.js';
-import { SearchKind, SearchOptions, SearchResponse } from './providers/SearchProvider.js';
+import type { SearchKind, SearchOptions, SearchResponse } from './providers/SearchProvider.js';
 import { SearchService } from './services/SearchService.js';
 import { FetchService } from './services/FetchService.js';
 import { looksLikeResultId, resolveResultId } from './utils/ids.js';
@@ -26,7 +26,7 @@ log(`Starting ${appConfig.server.name} v${appConfig.server.version}…`);
 SearchProviderFactory.setupDefaults({
   apiKey: appConfig.search.apiKey,
   maxResults: appConfig.search.maxResults,
-  timeout: appConfig.search.timeout,
+  timeout: appConfig.search.timeout
 });
 
 if (appConfig.search.defaultProvider) {
@@ -45,11 +45,39 @@ log(`Providers ready: ${PROVIDERS.join(', ')}`);
 /* -------------------------------------------------------------------------- */
 
 const MANDATORY_SEARCH_CATEGORIES: Record<string, RegExp[]> = {
-  weather: [/\bweather\b/i, /\btemperature\b/i, /\bforecast\b/i, /\bhumidity\b/i, /\brain\b/i, /\bsnow\b/i],
-  currentEvents: [/\bnews\b/i, /\blatest\b/i, /\brecent\b/i, /\btoday['']?s\b/i, /\bbreaking\b/i, /\bheadline/i],
-  sportsScores: [/\bscore\b/i, /\bmatch\b/i, /\bgame\b/i, /\bfinal score\b/i, /\bwinner\b/i, /who\s+won/i],
-  stockMarket: [/\bstock\b/i, /\bmarket\b/i, /\bnasdaq\b/i, /\bdow\b/i, /\bs&p\b/i, /\bshare price\b/i],
-  timeSensitive: [/\bnow\b/i, /\bcurrently\b/i, /\btoday\b/i, /\bthis week\b/i, /\bright now\b/i],
+  weather: [
+    /\bweather\b/i,
+    /\btemperature\b/i,
+    /\bforecast\b/i,
+    /\bhumidity\b/i,
+    /\brain\b/i,
+    /\bsnow\b/i
+  ],
+  currentEvents: [
+    /\bnews\b/i,
+    /\blatest\b/i,
+    /\brecent\b/i,
+    /\btoday['']?s\b/i,
+    /\bbreaking\b/i,
+    /\bheadline/i
+  ],
+  sportsScores: [
+    /\bscore\b/i,
+    /\bmatch\b/i,
+    /\bgame\b/i,
+    /\bfinal score\b/i,
+    /\bwinner\b/i,
+    /who\s+won/i
+  ],
+  stockMarket: [
+    /\bstock\b/i,
+    /\bmarket\b/i,
+    /\bnasdaq\b/i,
+    /\bdow\b/i,
+    /\bs&p\b/i,
+    /\bshare price\b/i
+  ],
+  timeSensitive: [/\bnow\b/i, /\bcurrently\b/i, /\btoday\b/i, /\bthis week\b/i, /\bright now\b/i]
 };
 
 const TIME_INDICATORS = [
@@ -60,19 +88,19 @@ const TIME_INDICATORS = [
   /\blatest\b/i,
   /\brecent\b/i,
   /\b202[3-9]\b/,
-  /\b203[0-9]\b/,
+  /\b203[0-9]\b/
 ];
 
 function categorize(query: string): string | null {
   for (const [category, patterns] of Object.entries(MANDATORY_SEARCH_CATEGORIES)) {
-    if (patterns.some((p) => p.test(query))) return category;
+    if (patterns.some(p => p.test(query))) return category;
   }
   return null;
 }
 
 function requiresRealTimeData(query: string): boolean {
   if (categorize(query)) return true;
-  return TIME_INDICATORS.some((p) => p.test(query));
+  return TIME_INDICATORS.some(p => p.test(query));
 }
 
 /* -------------------------------------------------------------------------- */
@@ -119,7 +147,7 @@ function buildSearchContent(resp: SearchResponse) {
   return [
     { type: 'text' as const, text: `> ${UNTRUSTED_BANNER}` },
     { type: 'text' as const, text: formatSearchMarkdown(resp) },
-    { type: 'text' as const, text: '```json\n' + JSON.stringify(resp, null, 2) + '\n```' },
+    { type: 'text' as const, text: '```json\n' + JSON.stringify(resp, null, 2) + '\n```' }
   ];
 }
 
@@ -129,7 +157,7 @@ function buildSearchContent(resp: SearchResponse) {
 
 const server = new Server(
   { name: appConfig.server.name, version: appConfig.server.version },
-  { capabilities: { tools: {} } },
+  { capabilities: { tools: {} } }
 );
 
 server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -145,21 +173,35 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           properties: {
             search_term: { type: 'string', description: 'The search query.' },
             provider: { type: 'string', description: 'Search provider.', enum: providerEnum },
-            count: { type: 'integer', description: 'Number of results (1–20).', minimum: 1, maximum: 20 },
+            count: {
+              type: 'integer',
+              description: 'Number of results (1–20).',
+              minimum: 1,
+              maximum: 20
+            },
             offset: { type: 'integer', description: 'Pagination offset.', minimum: 0 },
             cursor: { type: 'string', description: 'Opaque cursor from a previous response.' },
             freshness: {
               type: 'string',
-              description: "Recency filter: 'pd' (24h), 'pw' (week), 'pm' (month), 'py' (year), or 'YYYY-MM-DDtoYYYY-MM-DD'.",
+              description:
+                "Recency filter: 'pd' (24h), 'pw' (week), 'pm' (month), 'py' (year), or 'YYYY-MM-DDtoYYYY-MM-DD'."
             },
             country: { type: 'string', description: 'ISO country code (e.g. "us", "de").' },
             search_lang: { type: 'string', description: 'UI language (e.g. "en").' },
             safesearch: { type: 'string', enum: ['off', 'moderate', 'strict'] },
-            include_domains: { type: 'array', items: { type: 'string' }, description: 'Limit to these domains.' },
-            exclude_domains: { type: 'array', items: { type: 'string' }, description: 'Exclude these domains.' },
+            include_domains: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Limit to these domains.'
+            },
+            exclude_domains: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Exclude these domains.'
+            }
           },
-          required: ['search_term'],
-        },
+          required: ['search_term']
+        }
       },
       {
         name: 'news_search',
@@ -171,10 +213,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             search_term: { type: 'string' },
             count: { type: 'integer', minimum: 1, maximum: 20 },
             freshness: { type: 'string' },
-            country: { type: 'string' },
+            country: { type: 'string' }
           },
-          required: ['search_term'],
-        },
+          required: ['search_term']
+        }
       },
       {
         name: 'image_search',
@@ -185,10 +227,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           properties: {
             search_term: { type: 'string' },
             count: { type: 'integer', minimum: 1, maximum: 20 },
-            safesearch: { type: 'string', enum: ['off', 'moderate', 'strict'] },
+            safesearch: { type: 'string', enum: ['off', 'moderate', 'strict'] }
           },
-          required: ['search_term'],
-        },
+          required: ['search_term']
+        }
       },
       {
         name: 'fetch_url',
@@ -199,29 +241,32 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           properties: {
             id_or_url: {
               type: 'string',
-              description: 'A search result id (e.g. "r_abc123…") or a full http(s) URL.',
+              description: 'A search result id (e.g. "r_abc123…") or a full http(s) URL.'
             },
             url: {
               type: 'string',
-              description: 'Deprecated alias for id_or_url. Provide one of the two.',
+              description: 'Deprecated alias for id_or_url. Provide one of the two.'
             },
             max_chars: {
               type: 'integer',
               minimum: 200,
               maximum: 200_000,
-              description: 'Soft cap on returned characters (default 8000).',
+              description: 'Soft cap on returned characters (default 8000).'
             },
-            cursor: { type: 'string', description: 'Cursor from a previous response to continue reading.' },
-          },
-        },
+            cursor: {
+              type: 'string',
+              description: 'Cursor from a previous response to continue reading.'
+            }
+          }
+        }
       },
       {
         name: 'list_providers',
         description:
           'List the available search providers and which one is the default. Call this once if you are unsure whether news_search/image_search are available in this session.',
-        inputSchema: { type: 'object', properties: {} },
-      },
-    ],
+        inputSchema: { type: 'object', properties: {} }
+      }
+    ]
   };
 });
 
@@ -258,7 +303,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest)
     log(`tool '${name}' returned isError: ${msg}`);
     return {
       isError: true,
-      content: [{ type: 'text', text: `Error: ${msg}` }],
+      content: [{ type: 'text', text: `Error: ${msg}` }]
     };
   }
 });
@@ -280,7 +325,7 @@ async function handleSearch(args: Record<string, unknown>, kind: 'web' | 'news' 
     searchLang: asString(args.search_lang),
     safesearch: asString(args.safesearch) as SearchOptions['safesearch'],
     includeDomains: asStringArray(args.include_domains),
-    excludeDomains: asStringArray(args.exclude_domains),
+    excludeDomains: asStringArray(args.exclude_domains)
   };
 
   // news/images are only supported by capable providers (currently Brave).
@@ -295,15 +340,15 @@ async function handleSearch(args: Record<string, unknown>, kind: 'web' | 'news' 
     requiresRealTimeData: requiresRealTimeData(query),
     category: category ?? 'general',
     provider: result.provider,
-    cached: !!result.cached,
+    cached: !!result.cached
   };
   log(
     `${kind}_search "${query}" → ${result.results.length} results via ${result.provider}` +
-      (meta.cached ? ' (cache hit)' : ''),
+      (meta.cached ? ' (cache hit)' : '')
   );
   return {
     content: buildSearchContent(result),
-    _meta: meta,
+    _meta: meta
   };
 }
 
@@ -318,7 +363,7 @@ async function handleFetchUrl(args: Record<string, unknown>) {
     const resolved = resolveResultId(ref);
     if (!resolved) {
       throw new Error(
-        `Result id '${ref}' is unknown or expired. Re-run the search and use a fresh id, or pass a full URL.`,
+        `Result id '${ref}' is unknown or expired. Re-run the search and use a fresh id, or pass a full URL.`
       );
     }
     url = resolved;
@@ -333,7 +378,7 @@ async function handleFetchUrl(args: Record<string, unknown>) {
   const headerMeta = [
     `status: ${doc.status}`,
     `type: ${doc.contentType || 'unknown'}`,
-    `${doc.byteLength} bytes`,
+    `${doc.byteLength} bytes`
   ];
   if (doc.cached) headerMeta.push('cache: hit');
   if (doc.nextCursor) headerMeta.push('truncated');
@@ -349,20 +394,24 @@ async function handleFetchUrl(args: Record<string, unknown>) {
 
   const linksBlock =
     doc.links.length > 0
-      ? '## Links\n' + doc.links.slice(0, 25).map((l) => `- [${l.text}](${l.href})`).join('\n')
+      ? '## Links\n' +
+        doc.links
+          .slice(0, 25)
+          .map(l => `- [${l.text}](${l.href})`)
+          .join('\n')
       : '';
 
   return {
     content: [
       { type: 'text' as const, text: summary },
-      ...(linksBlock ? [{ type: 'text' as const, text: linksBlock }] : []),
+      ...(linksBlock ? [{ type: 'text' as const, text: linksBlock }] : [])
     ],
     _meta: {
       url: doc.url,
       finalUrl: doc.finalUrl,
       cached: !!doc.cached,
-      nextCursor: doc.nextCursor,
-    },
+      nextCursor: doc.nextCursor
+    }
   };
 }
 
@@ -376,11 +425,11 @@ function handleListProviders() {
   const lines = [
     '# Available search providers',
     '',
-    ...PROVIDERS.map((p) => `- ${p}${p === defaultName.toLowerCase() ? '  _(default)_' : ''}`),
+    ...PROVIDERS.map(p => `- ${p}${p === defaultName.toLowerCase() ? '  _(default)_' : ''}`)
   ];
   return {
     content: [{ type: 'text' as const, text: lines.join('\n') }],
-    _meta: { providers: PROVIDERS, default: defaultName },
+    _meta: { providers: PROVIDERS, default: defaultName }
   };
 }
 
@@ -411,7 +460,7 @@ function pickProviderFor(kind: SearchKind, requested: string | undefined): strin
     if (SearchProviderFactory.get(name).supports(kind)) return name;
   }
   throw new Error(
-    `No registered provider supports ${kind} search. Configure BRAVE_API_KEY to enable it.`,
+    `No registered provider supports ${kind} search. Configure BRAVE_API_KEY to enable it.`
   );
 }
 

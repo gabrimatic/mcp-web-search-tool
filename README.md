@@ -179,10 +179,28 @@ CI runs on Node 18, 20, and 22, plus a Docker image build. Tests cover the LRU+T
 
 ---
 
-## Credits
+## 📜 License
 
-[MIT](LICENSE). By [Soroush Yousefpour](https://gabrimatic.info).
+[MIT License](LICENSE)
 
-[Live demo](https://youtu.be/6jAnjJSCL30?si=4n0-NtTyG_3SVaFh) · [Medium write-up](https://medium.com/@gabrimatic/introducing-mcp-web-search-tool-bridging-ai-assistants-to-real-time-web-information-5df9ab92ad02)
+## 👨‍💻 Developer
+
+By [Soroush Yousefpour](https://gabrimatic.info "Soroush Yousefpour")
+
+&copy; All rights reserved.
+
+## 🎥 YouTube Video
+
+Watch the MCP Web Search Tool in action with Claude:
+
+📺 [Claude + MCP Web Search – Live Demo](https://youtu.be/6jAnjJSCL30?si=4n0-NtTyG_3SVaFh)
+
+## 📝 Medium Article
+
+Read more about the MCP Web Search Tool, its capabilities, and how it enhances AI-driven web search:
+
+📖 [Deep Dive into MCP Web Search Tool](https://medium.com/@gabrimatic/introducing-mcp-web-search-tool-bridging-ai-assistants-to-real-time-web-information-5df9ab92ad02)
+
+## ☕ Support
 
 <a href="https://www.buymeacoffee.com/gabrimatic" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Book" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>

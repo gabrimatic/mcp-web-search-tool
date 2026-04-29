@@ -50,22 +50,22 @@ export function loadConfig(): AppConfig {
   if (!apiKey && !allowKeyless) {
     throw new Error(
       'BRAVE_API_KEY is not set and ALLOW_KEYLESS is disabled. ' +
-        'Set BRAVE_API_KEY in .env or set ALLOW_KEYLESS=true to use keyless providers (DuckDuckGo).',
+        'Set BRAVE_API_KEY in .env or set ALLOW_KEYLESS=true to use keyless providers (DuckDuckGo).'
     );
   }
 
   return {
     server: {
       name: 'mcp-web-search-tool',
-      version: readPackageVersion(),
+      version: readPackageVersion()
     },
     search: {
       apiKey,
       maxResults: clampInt(process.env.MAX_RESULTS, 10, 1, 50),
       timeout: clampInt(process.env.REQUEST_TIMEOUT, 10_000, 1_000, 60_000),
-      defaultProvider: process.env.DEFAULT_PROVIDER,
+      defaultProvider: process.env.DEFAULT_PROVIDER
     },
-    allowKeyless,
+    allowKeyless
   };
 }
 

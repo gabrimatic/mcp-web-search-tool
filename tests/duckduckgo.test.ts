@@ -19,7 +19,7 @@ describe('parseDdgResults', () => {
     expect(out[0]).toMatchObject({
       title: 'First & Best',
       url: 'https://example.com/a',
-      description: 'A great snippet about things.',
+      description: 'A great snippet about things.'
     });
     expect(out[0]?.id).toMatch(/^r_[0-9a-f]{12}$/);
     expect(out[1]?.url).toBe('https://example.org/b');

@@ -2,8 +2,7 @@
  * HTTP helpers: timeout-aware fetch and exponential backoff with jitter.
  */
 
-const USER_AGENT =
-  'mcp-web-search-tool/2.0 (+https://github.com/gabrimatic/mcp-web-search-tool)';
+const USER_AGENT = 'mcp-web-search-tool/2.0 (+https://github.com/gabrimatic/mcp-web-search-tool)';
 
 export interface FetchOptions {
   method?: string;
@@ -22,7 +21,7 @@ export class HttpError extends Error {
   constructor(
     message: string,
     public readonly status: number,
-    public readonly body?: string,
+    public readonly body?: string
   ) {
     super(message);
     this.name = 'HttpError';
@@ -39,13 +38,13 @@ export async function httpFetch(url: string, opts: FetchOptions = {}): Promise<R
     timeoutMs = 10_000,
     retries = 2,
     onRetry,
-    redirect = 'follow',
+    redirect = 'follow'
   } = opts;
 
   const finalHeaders: Record<string, string> = {
     'User-Agent': USER_AGENT,
     Accept: 'application/json,text/html;q=0.9,*/*;q=0.5',
-    ...headers,
+    ...headers
   };
 
   let attempt = 0;
@@ -60,7 +59,7 @@ export async function httpFetch(url: string, opts: FetchOptions = {}): Promise<R
         headers: finalHeaders,
         body,
         signal: controller.signal,
-        redirect,
+        redirect
       });
       clearTimeout(timer);
 
@@ -97,11 +96,11 @@ function isNetworkError(err: unknown): boolean {
 async function backoff(
   attempt: number,
   onRetry: FetchOptions['onRetry'],
-  err: unknown,
+  err: unknown
 ): Promise<void> {
   const base = 250 * Math.pow(2, attempt); // 250ms, 500, 1000, ...
   const jitter = Math.floor(Math.random() * 100);
   const delay = base + jitter;
   onRetry?.(attempt + 1, err);
-  await new Promise((r) => setTimeout(r, delay));
+  await new Promise(r => setTimeout(r, delay));
 }

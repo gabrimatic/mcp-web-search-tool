@@ -1,13 +1,8 @@
 import { httpFetch, HttpError } from '../utils/http.js';
 import { mintResultId } from '../utils/ids.js';
 import { matchesAnyDomain } from './BraveSearchProvider.js';
-import {
-  SearchKind,
-  SearchOptions,
-  SearchProvider,
-  SearchResponse,
-  SearchResult,
-} from './SearchProvider.js';
+import type { SearchKind, SearchOptions, SearchResponse, SearchResult } from './SearchProvider.js';
+import { SearchProvider } from './SearchProvider.js';
 
 /**
  * Keyless fallback provider that scrapes the lightweight HTML endpoint.
@@ -39,8 +34,8 @@ export class DuckDuckGoProvider extends SearchProvider {
       timeoutMs: this.config.timeout,
       headers: {
         Accept: 'text/html',
-        'Accept-Language': options.searchLang ?? 'en-US,en;q=0.9',
-      },
+        'Accept-Language': options.searchLang ?? 'en-US,en;q=0.9'
+      }
     });
 
     if (!res.ok) {
@@ -56,7 +51,7 @@ export class DuckDuckGoProvider extends SearchProvider {
     out.results = parseDdgResults(html, limit);
 
     if (options.excludeDomains?.length) {
-      out.results = out.results.filter((r) => !matchesAnyDomain(r.url, options.excludeDomains!));
+      out.results = out.results.filter(r => !matchesAnyDomain(r.url, options.excludeDomains!));
     }
     return out;
   }
@@ -64,10 +59,10 @@ export class DuckDuckGoProvider extends SearchProvider {
   private buildQuery(query: string, opts: SearchOptions): string {
     const parts = [query];
     if (opts.includeDomains?.length) {
-      parts.push('(' + opts.includeDomains.map((d) => `site:${d}`).join(' OR ') + ')');
+      parts.push('(' + opts.includeDomains.map(d => `site:${d}`).join(' OR ') + ')');
     }
     if (opts.excludeDomains?.length) {
-      parts.push(...opts.excludeDomains.map((d) => `-site:${d}`));
+      parts.push(...opts.excludeDomains.map(d => `-site:${d}`));
     }
     return parts.join(' ');
   }

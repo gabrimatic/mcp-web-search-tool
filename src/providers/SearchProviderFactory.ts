@@ -1,6 +1,6 @@
 import { BraveSearchProvider } from './BraveSearchProvider.js';
 import { DuckDuckGoProvider } from './DuckDuckGoProvider.js';
-import { SearchProvider, SearchProviderConfig } from './SearchProvider.js';
+import type { SearchProvider, SearchProviderConfig } from './SearchProvider.js';
 
 export class SearchProviderFactory {
   private static providers = new Map<string, SearchProvider>();
@@ -51,5 +51,4 @@ export class SearchProviderFactory {
     ddg.initialize(config);
     this.add(ddg, !config.apiKey);
   }
-
 }

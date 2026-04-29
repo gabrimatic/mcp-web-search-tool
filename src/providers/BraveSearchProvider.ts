@@ -1,12 +1,7 @@
 import { httpFetch, HttpError } from '../utils/http.js';
 import { mintResultId } from '../utils/ids.js';
-import {
-  SearchKind,
-  SearchOptions,
-  SearchProvider,
-  SearchResponse,
-  SearchResult,
-} from './SearchProvider.js';
+import type { SearchKind, SearchOptions, SearchResponse, SearchResult } from './SearchProvider.js';
+import { SearchProvider } from './SearchProvider.js';
 
 interface BraveWebApiResponse {
   web?: { results?: BraveWebItem[]; totalResults?: number; timeTaken?: number };
@@ -55,7 +50,7 @@ interface BraveImageItem {
 const ENDPOINTS: Record<SearchKind, string> = {
   web: 'https://api.search.brave.com/res/v1/web/search',
   news: 'https://api.search.brave.com/res/v1/news/search',
-  images: 'https://api.search.brave.com/res/v1/images/search',
+  images: 'https://api.search.brave.com/res/v1/images/search'
 };
 
 export class BraveSearchProvider extends SearchProvider {
@@ -91,8 +86,8 @@ export class BraveSearchProvider extends SearchProvider {
       timeoutMs: this.config!.timeout,
       headers: {
         Accept: 'application/json',
-        'X-Subscription-Token': this.config!.apiKey,
-      },
+        'X-Subscription-Token': this.config!.apiKey
+      }
     });
 
     if (!res.ok) {
@@ -128,7 +123,7 @@ export class BraveSearchProvider extends SearchProvider {
     }
 
     if (options.excludeDomains?.length) {
-      out.results = out.results.filter((r) => !matchesAnyDomain(r.url, options.excludeDomains!));
+      out.results = out.results.filter(r => !matchesAnyDomain(r.url, options.excludeDomains!));
     }
 
     return out;
@@ -137,11 +132,11 @@ export class BraveSearchProvider extends SearchProvider {
   private applyDomainFilters(query: string, opts: SearchOptions): string {
     const parts = [query];
     if (opts.includeDomains?.length) {
-      parts.push('(' + opts.includeDomains.map((d) => `site:${d}`).join(' OR ') + ')');
+      parts.push('(' + opts.includeDomains.map(d => `site:${d}`).join(' OR ') + ')');
     }
     // Brave does not reliably honor `-site:` operator; we also post-filter excludeDomains.
     if (opts.excludeDomains?.length) {
-      parts.push(...opts.excludeDomains.map((d) => `-site:${d}`));
+      parts.push(...opts.excludeDomains.map(d => `-site:${d}`));
     }
     return parts.join(' ');
   }
@@ -172,7 +167,7 @@ function toWebResult(r: BraveWebItem): SearchResult {
     description: r.description,
     publishedAt: r.page_age ?? r.age,
     source: r.meta_url?.hostname,
-    thumbnail: r.thumbnail?.src,
+    thumbnail: r.thumbnail?.src
   };
 }
 
@@ -185,7 +180,7 @@ function toNewsResult(r: BraveNewsItem): SearchResult {
     description: r.description ?? '',
     publishedAt: r.page_age ?? r.age,
     source: r.source ?? r.meta_url?.hostname,
-    thumbnail: r.thumbnail?.src,
+    thumbnail: r.thumbnail?.src
   };
 }
 
@@ -197,7 +192,7 @@ function toImageResult(r: BraveImageItem): SearchResult {
     url,
     description: r.source ?? '',
     thumbnail: r.thumbnail?.src,
-    source: r.source,
+    source: r.source
   };
 }
 

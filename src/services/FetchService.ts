@@ -2,7 +2,8 @@ import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import { promises as dns } from 'dns';
 import { isIP } from 'net';
 import { httpFetch } from '../utils/http.js';
-import { extractReadable, ExtractedPage } from '../utils/html.js';
+import type { ExtractedPage } from '../utils/html.js';
+import { extractReadable } from '../utils/html.js';
 import { LruCache } from '../utils/cache.js';
 
 export interface FetchedDocument extends ExtractedPage {
@@ -17,7 +18,7 @@ export interface FetchedDocument extends ExtractedPage {
 
 const cache = new LruCache<FetchedDocument>(
   Number(process.env.FETCH_CACHE_MAX) || 128,
-  Number(process.env.FETCH_CACHE_TTL_MS) || 10 * 60 * 1000,
+  Number(process.env.FETCH_CACHE_TTL_MS) || 10 * 60 * 1000
 );
 
 const DEFAULT_TIMEOUT = Number(process.env.FETCH_TIMEOUT_MS) || 15_000;
@@ -60,7 +61,7 @@ export class FetchService {
         res = await httpFetch(current.toString(), {
           timeoutMs,
           retries: hop === 0 ? 1 : 0,
-          redirect: 'manual',
+          redirect: 'manual'
         });
 
         if (res.status >= 300 && res.status < 400) {
@@ -69,7 +70,7 @@ export class FetchService {
           if (hop === MAX_REDIRECTS) {
             throw new McpError(
               ErrorCode.InternalError,
-              `Too many redirects while fetching ${initial.toString()}`,
+              `Too many redirects while fetching ${initial.toString()}`
             );
           }
           await res.body?.cancel().catch(() => undefined);
@@ -77,7 +78,7 @@ export class FetchService {
           if (current.protocol !== 'http:' && current.protocol !== 'https:') {
             throw new McpError(
               ErrorCode.InvalidRequest,
-              `Refusing to follow non-http(s) redirect to ${current.protocol}`,
+              `Refusing to follow non-http(s) redirect to ${current.protocol}`
             );
           }
           continue;
@@ -122,7 +123,7 @@ export class FetchService {
         finalUrl: current.toString(),
         status: res.status,
         contentType,
-        ...(nextCursor ? { nextCursor } : {}),
+        ...(nextCursor ? { nextCursor } : {})
       };
       cache.set(key, doc);
       return doc;
@@ -148,7 +149,7 @@ function parseAndCheckScheme(rawUrl: string): URL {
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
     throw new McpError(
       ErrorCode.InvalidRequest,
-      `Only http/https URLs are allowed (got ${parsed.protocol})`,
+      `Only http/https URLs are allowed (got ${parsed.protocol})`
     );
   }
   return parsed;
@@ -164,38 +165,32 @@ async function assertPublicHost(hostname: string): Promise<void> {
   const lower = stripped.toLowerCase();
 
   if (lower === 'localhost' || lower.endsWith('.local') || lower.endsWith('.internal')) {
-    throw new McpError(
-      ErrorCode.InvalidRequest,
-      `Refusing to fetch internal host: ${hostname}`,
-    );
+    throw new McpError(ErrorCode.InvalidRequest, `Refusing to fetch internal host: ${hostname}`);
   }
 
   const literal = ipFromLiteral(stripped);
   if (literal) {
     if (isPrivateIp(literal)) {
-      throw new McpError(
-        ErrorCode.InvalidRequest,
-        `Refusing to fetch private host: ${hostname}`,
-      );
+      throw new McpError(ErrorCode.InvalidRequest, `Refusing to fetch private host: ${hostname}`);
     }
     return;
   }
 
-  let addrs: string[] = [];
+  let addrs: string[];
   try {
     const records = await dns.lookup(stripped, { all: true, verbatim: true });
-    addrs = records.map((r) => r.address);
+    addrs = records.map(r => r.address);
   } catch (err) {
     throw new McpError(
       ErrorCode.InvalidRequest,
-      `Cannot resolve host '${hostname}': ${(err as Error).message}`,
+      `Cannot resolve host '${hostname}': ${(err as Error).message}`
     );
   }
   for (const addr of addrs) {
     if (isPrivateIp(addr)) {
       throw new McpError(
         ErrorCode.InvalidRequest,
-        `Refusing to fetch private host: ${hostname} → ${addr}`,
+        `Refusing to fetch private host: ${hostname} → ${addr}`
       );
     }
   }
@@ -246,7 +241,7 @@ function parseLooseIPv4(host: string): string | null {
     c = (nums[2] >>> 8) & 0xff;
     d = nums[2] & 0xff;
   } else {
-    if (nums.some((n) => n > 0xff)) return null;
+    if (nums.some(n => n > 0xff)) return null;
     [a, b, c, d] = nums;
   }
   return `${a}.${b}.${c}.${d}`;
@@ -261,7 +256,7 @@ export function isPrivateIp(ip: string): boolean {
 
 function isPrivateIPv4(ip: string): boolean {
   const parts = ip.split('.').map(Number);
-  if (parts.length !== 4 || parts.some((n) => Number.isNaN(n))) return false;
+  if (parts.length !== 4 || parts.some(n => Number.isNaN(n))) return false;
   const [a, b] = parts;
   if (a === 0) return true;
   if (a === 10) return true;
@@ -297,14 +292,13 @@ async function readBodyCapped(res: Response, maxBytes: number): Promise<Buffer> 
     const remaining = maxBytes - bytes;
     if (value.byteLength > remaining) {
       chunks.push(value.subarray(0, remaining));
-      bytes += remaining;
       break;
     }
     chunks.push(value);
     bytes += value.byteLength;
   }
   await reader.cancel().catch(() => undefined);
-  return Buffer.concat(chunks.map((c) => Buffer.from(c)));
+  return Buffer.concat(chunks.map(c => Buffer.from(c)));
 }
 
 function encodeBodyCursor(offset: number): string {

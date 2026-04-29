@@ -14,7 +14,7 @@ describe('isPrivateIp', () => {
       '169.254.1.1',
       '100.64.0.1',
       '224.0.0.1',
-      '0.0.0.0',
+      '0.0.0.0'
     ]) {
       expect(isPrivateIp(ip), ip).toBe(true);
     }
