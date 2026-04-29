@@ -1,7 +1,7 @@
 {
   "name": "mcp-web-search-tool",
-  "version": "1.0.0",
-  "description": "MCP Web Search Tool - A Model Context Protocol server that provides web search capabilities",
+  "version": "2.0.0",
+  "description": "MCP Web Search Tool — Model Context Protocol server providing real-time web search, news, image search, and URL content extraction with pluggable providers (Brave, DuckDuckGo).",
   "private": false,
   "type": "module",
   "bin": {
@@ -16,8 +16,9 @@
     "watch": "tsc --watch",
     "inspector": "npx @modelcontextprotocol/inspector build/index.js",
     "start": "node build/index.js",
-    "dev": "nodemon --exec \"npx ts-node\" src/index.ts",
-    "test": "npm run build && npx ts-node test/manual-test.ts",
+    "dev": "node --import tsx/esm --watch src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write \"src/**/*.ts\""
   },
@@ -26,7 +27,10 @@
     "model-context-protocol",
     "web-search",
     "brave-search",
-    "ai-tools"
+    "duckduckgo",
+    "ai-tools",
+    "url-fetch",
+    "news-search"
   ],
   "author": "Soroush Yousefpour <h.yusefpour@gmail.com>",
   "license": "MIT",
@@ -40,23 +44,22 @@
   "homepage": "https://github.com/gabrimatic/mcp-web-search-tool#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "0.6.0",
-    "dotenv": "^16.4.7",
-    "node-fetch": "^2.7.0"
+    "dotenv": "^16.4.7"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
-    "@types/node-fetch": "^2.6.12",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
-    "nodemon": "^3.1.9",
     "prettier": "^3.2.5",
-    "typescript": "^5.3.3"
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.6.0"
   },
   "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=7.0.0"
+    "node": ">=18.17.0",
+    "npm": ">=9.0.0"
   }
 }

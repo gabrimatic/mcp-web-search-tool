@@ -1,87 +1,72 @@
-
-
 import { config as dotenvConfig } from 'dotenv';
-import { resolve } from 'path';
+import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { readFileSync } from 'fs';
 
-// Get the project root directory
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const rootDir = resolve(__dirname, '..');
 
-// Load environment variables from .env file
 dotenvConfig({ path: resolve(rootDir, '.env') });
 
-/**
- * Server configuration
- */
 export interface ServerConfig {
-    name: string;
-    version: string;
+  name: string;
+  version: string;
 }
 
-/**
- * Search configuration
- */
 export interface SearchConfig {
-    apiKey: string;
-    maxResults: number;
-    timeout: number;
+  apiKey: string;
+  maxResults: number;
+  timeout: number;
+  defaultProvider?: string;
 }
 
-/**
- * Application configuration
- */
 export interface AppConfig {
-    server: ServerConfig;
-    search: SearchConfig;
+  server: ServerConfig;
+  search: SearchConfig;
+  /** When true, the server boots without a Brave API key and uses keyless providers. */
+  allowKeyless: boolean;
 }
 
-/**
- * Validate that required configuration is present
- *
- * @param config The configuration to validate
- * @throws Error if configuration is invalid
- */
-function validateConfig(config: AppConfig): void {
-    if (!config.search.apiKey) {
-        throw new Error(
-            'BRAVE_API_KEY environment variable is not set. ' +
-            'Please create a .env file in the project root with your API key.'
-        );
-    }
+function readPackageVersion(): string {
+  try {
+    const pkg = JSON.parse(readFileSync(resolve(rootDir, 'package.json'), 'utf8'));
+    return typeof pkg.version === 'string' ? pkg.version : '0.0.0';
+  } catch {
+    return '0.0.0';
+  }
 }
 
-/**
- * Load application configuration from environment variables
- *
- * @returns The application configuration
- * @throws Error if configuration is invalid
- */
+function clampInt(value: string | undefined, fallback: number, min: number, max: number): number {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(min, Math.min(max, Math.floor(n)));
+}
+
 export function loadConfig(): AppConfig {
-    // Create configuration object
-    const appConfig: AppConfig = {
-        server: {
-            name: 'mcp-web-search-tool',
-            version: '1.0.0',
-        },
-        search: {
-            apiKey: process.env.BRAVE_API_KEY || '',
-            maxResults: Number(process.env.MAX_RESULTS) || 10,
-            timeout: Number(process.env.REQUEST_TIMEOUT) || 10000,
-        }
-    };
+  const apiKey = process.env.BRAVE_API_KEY ?? '';
+  const allowKeyless = (process.env.ALLOW_KEYLESS ?? 'true').toLowerCase() !== 'false';
 
-    // Validate the configuration
-    validateConfig(appConfig);
+  if (!apiKey && !allowKeyless) {
+    throw new Error(
+      'BRAVE_API_KEY is not set and ALLOW_KEYLESS is disabled. ' +
+        'Set BRAVE_API_KEY in .env or set ALLOW_KEYLESS=true to use keyless providers (DuckDuckGo).',
+    );
+  }
 
-    return appConfig;
+  return {
+    server: {
+      name: 'mcp-web-search-tool',
+      version: readPackageVersion(),
+    },
+    search: {
+      apiKey,
+      maxResults: clampInt(process.env.MAX_RESULTS, 10, 1, 50),
+      timeout: clampInt(process.env.REQUEST_TIMEOUT, 10_000, 1_000, 60_000),
+      defaultProvider: process.env.DEFAULT_PROVIDER,
+    },
+    allowKeyless,
+  };
 }
 
-/**
- * Get the application configuration
- *
- * @throws Error if configuration is invalid
- */
 export const appConfig = loadConfig();
