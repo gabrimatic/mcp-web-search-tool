@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const rootDir = resolve(__dirname, '..');
 
-dotenvConfig({ path: resolve(rootDir, '.env') });
+dotenvConfig({ path: resolve(rootDir, '.env'), quiet: true });
 
 export interface ServerConfig {
   name: string;
