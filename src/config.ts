@@ -16,6 +16,7 @@ export interface ServerConfig {
 
 export interface SearchConfig {
   apiKey: string;
+  youcomApiKey: string;
   maxResults: number;
   timeout: number;
   defaultProvider?: string;
@@ -45,12 +46,14 @@ function clampInt(value: string | undefined, fallback: number, min: number, max:
 
 export function loadConfig(): AppConfig {
   const apiKey = process.env.BRAVE_API_KEY ?? '';
+  const youcomApiKey = process.env.YOUCOM_API_KEY ?? '';
   const allowKeyless = (process.env.ALLOW_KEYLESS ?? 'true').toLowerCase() !== 'false';
 
-  if (!apiKey && !allowKeyless) {
+  if (!apiKey && !youcomApiKey && !allowKeyless) {
     throw new Error(
-      'BRAVE_API_KEY is not set and ALLOW_KEYLESS is disabled. ' +
-        'Set BRAVE_API_KEY in .env or set ALLOW_KEYLESS=true to use keyless providers (DuckDuckGo).'
+      'BRAVE_API_KEY / YOUCOM_API_KEY is not set and ALLOW_KEYLESS is disabled. ' +
+        'Set BRAVE_API_KEY or YOUCOM_API_KEY in .env, or set ALLOW_KEYLESS=true ' +
+        'to use keyless providers (You.com Search, DuckDuckGo).'
     );
   }
 
@@ -61,6 +64,7 @@ export function loadConfig(): AppConfig {
     },
     search: {
       apiKey,
+      youcomApiKey,
       maxResults: clampInt(process.env.MAX_RESULTS, 10, 1, 50),
       timeout: clampInt(process.env.REQUEST_TIMEOUT, 10_000, 1_000, 60_000),
       defaultProvider: process.env.DEFAULT_PROVIDER

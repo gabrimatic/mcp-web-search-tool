@@ -25,6 +25,7 @@ log(`Starting ${appConfig.server.name} v${appConfig.server.version}…`);
 
 SearchProviderFactory.setupDefaults({
   apiKey: appConfig.search.apiKey,
+  youcomApiKey: appConfig.search.youcomApiKey,
   maxResults: appConfig.search.maxResults,
   timeout: appConfig.search.timeout
 });
