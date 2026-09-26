@@ -1,5 +1,6 @@
 import { BraveSearchProvider } from './BraveSearchProvider.js';
 import { DuckDuckGoProvider } from './DuckDuckGoProvider.js';
+import { YouSearchProvider } from './YouSearchProvider.js';
 import type { SearchProvider, SearchProviderConfig } from './SearchProvider.js';
 
 export class SearchProviderFactory {
@@ -40,6 +41,8 @@ export class SearchProviderFactory {
    * Register the default set of providers. Brave is the primary provider when
    * an API key is present; DuckDuckGo (keyless) is always registered as a
    * fallback so the server is usable without configuration.
+   * You.com Search (keyless-capable) is registered when YOUCOM_API_KEY is set
+   * or when keyless mode is allowed.
    */
   static setupDefaults(config: SearchProviderConfig): void {
     if (config.apiKey) {
@@ -47,8 +50,18 @@ export class SearchProviderFactory {
       brave.initialize(config);
       this.add(brave, true);
     }
+    if (config.youcomApiKey) {
+      const you = new YouSearchProvider();
+      you.initialize({ ...config, apiKey: config.youcomApiKey });
+      this.add(you);
+    } else {
+      // Register keyless You.com provider (free profile)
+      const you = new YouSearchProvider();
+      you.initialize(config);
+      this.add(you);
+    }
     const ddg = new DuckDuckGoProvider();
     ddg.initialize(config);
-    this.add(ddg, !config.apiKey);
+    this.add(ddg, !config.apiKey && !config.youcomApiKey);
   }
 }

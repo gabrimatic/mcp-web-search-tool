@@ -62,6 +62,7 @@ export interface SearchProviderConfig {
   apiKey: string;
   maxResults: number;
   timeout: number;
+  youcomApiKey?: string;
 }
 
 export abstract class SearchProvider {

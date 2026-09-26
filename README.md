@@ -14,7 +14,7 @@ An [MCP](https://modelcontextprotocol.io) server that gives an assistant live we
 
 ## Overview
 
-Five tools: `web_search`, `news_search`, `image_search`, `fetch_url`, `list_providers`. Search returns ranked summaries with stable ids; `fetch_url` reads the page behind any id. Brave Search is the primary provider; DuckDuckGo runs without a key as a fallback.
+Five tools: `web_search`, `news_search`, `image_search`, `fetch_url`, `list_providers`. Search returns ranked summaries with stable ids; `fetch_url` reads the page behind any id. Three pluggable providers: Brave Search (web, news, images — requires an API key), You.com Search (keyless free tier + authenticated), and DuckDuckGo (keyless fallback).
 
 ## Requirements
 
@@ -22,7 +22,7 @@ Five tools: `web_search`, `news_search`, `image_search`, `fetch_url`, `list_prov
 |---|---|
 | **Node.js** | `>= 20.18` (uses native `fetch`) |
 | **npm** | `>= 10` |
-| **Brave Search API key** | optional. Without it, DuckDuckGo handles `web_search`. `news_search` and `image_search` require a key. |
+| **Search provider API keys** | optional. Without a key, You.com Search (keyless free tier) and DuckDuckGo handle `web_search`. `news_search` and `image_search` require a Brave API key. |
 
 ## Quick start
 
@@ -57,7 +57,7 @@ Live web search. Use first for current, source-backed answers.
 | Parameter | Type | Description |
 |---|---|---|
 | `search_term` | string, **required** | Query string. |
-| `provider` | enum | `"brave search"` or `"duckduckgo"`. Defaults to Brave when a key is set, otherwise DuckDuckGo. |
+| `provider` | enum | `"brave search"`, `"you.com search"`, or `"duckduckgo"`. Defaults to the first available provider. |
 | `count` | int (1–20) | Number of results. Default 10. |
 | `offset` | int | Pagination offset (web only). |
 | `cursor` | string | Opaque cursor from a previous response. |
@@ -103,11 +103,12 @@ All configuration is environment-driven. Reference: [`.env.example`](./.env.exam
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `BRAVE_API_KEY` | empty | Brave Search API key. When unset, DuckDuckGo is used. |
+| `BRAVE_API_KEY` | empty | Brave Search API key. When unset, You.com Search and DuckDuckGo are used. |
+| `YOUCOM_API_KEY` | empty | You.com Search API key (optional — keyless free tier works without it). Get one at https://you.com/platform/api-keys. |
 | `MAX_RESULTS` | `10` | Default result count (clamped 1–50). |
 | `REQUEST_TIMEOUT` | `10000` | Per-request timeout in ms (1 000–60 000). |
-| `DEFAULT_PROVIDER` | auto | Force a specific provider (e.g. `duckduckgo`). |
-| `ALLOW_KEYLESS` | `true` | When `false`, the server refuses to start without `BRAVE_API_KEY`. |
+| `DEFAULT_PROVIDER` | auto | Force a specific provider (e.g. `you.com search`, `brave search`, `duckduckgo`). |
+| `ALLOW_KEYLESS` | `true` | When `false`, the server refuses to start without an API key. |
 | `CACHE_MAX_ENTRIES` / `CACHE_TTL_MS` | `256` / `300000` | Search cache. |
 | `FETCH_CACHE_MAX` / `FETCH_CACHE_TTL_MS` | `128` / `600000` | URL-fetch cache. |
 | `FETCH_TIMEOUT_MS` / `FETCH_MAX_BYTES` | `15000` / `2000000` | Per-request budget for `fetch_url`. |
@@ -124,6 +125,7 @@ src/
 │   ├── SearchProvider.ts       abstract contract and shared types
 │   ├── SearchProviderFactory   registry and default selection
 │   ├── BraveSearchProvider     web/news/images via Brave API
+│   ├── YouSearchProvider       web search via You.com API (keyless)
 │   └── DuckDuckGoProvider      keyless HTML-lite fallback
 ├── services/
 │   ├── SearchService.ts        provider dispatch, LRU+TTL cache
