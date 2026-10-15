@@ -3,38 +3,41 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore: &docs
+      - '**.md'
+      - 'banner.png'
+      - 'LICENSE'
+      - '.github/dependabot.yml'
   pull_request:
+    paths-ignore: *docs
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     name: Build & Test (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        node: [20, 22, 24]
+        node: [22, 24]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node }}
           cache: npm
-      - run: npm ci || npm install
-      - run: npm run lint --if-present
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run typecheck
       - run: npm run build
       - run: npm test
-
-  docker:
-    name: Docker build
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: false
-          tags: mcp-web-search-tool:ci

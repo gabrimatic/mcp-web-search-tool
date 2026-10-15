@@ -1,0 +1,30 @@
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+    open-pull-requests-limit: 5
+    groups:
+      npm:
+        applies-to: version-updates
+        patterns: ['*']
+      npm-security:
+        applies-to: security-updates
+        patterns: ['*']
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+    groups:
+      github-actions:
+        patterns: ['*']
+
+  - package-ecosystem: 'docker'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+    groups:
+      docker:
+        patterns: ['*']

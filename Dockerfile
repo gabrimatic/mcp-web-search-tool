@@ -3,7 +3,7 @@
 # Multi-stage build for the MCP Web Search Tool.
 # -----------------------------------------------------------------------------
 
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json* ./
 # --ignore-scripts skips the `prepare` hook so tsc isn't invoked before
@@ -14,7 +14,7 @@ COPY tsconfig.json ./
 COPY src ./src
 RUN npm run build
 
-FROM node:22-alpine AS runtime
+FROM node:24-alpine AS runtime
 ENV NODE_ENV=production \
     ALLOW_KEYLESS=true
 WORKDIR /app
