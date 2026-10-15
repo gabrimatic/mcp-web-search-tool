@@ -26,6 +26,16 @@ Five tools: `web_search`, `news_search`, `image_search`, `fetch_url`, `list_prov
 
 ## Quick start
 
+From npm:
+
+```bash
+npx -y mcp-web-search-tool
+```
+
+Point your MCP client at `npx` with args `["-y", "mcp-web-search-tool"]` and pass `BRAVE_API_KEY` through the client's `env` block.
+
+From source:
+
 ```bash
 git clone https://github.com/gabrimatic/mcp-web-search-tool.git
 cd mcp-web-search-tool

@@ -4,6 +4,31 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] — 2026-10-15
+
+### Added
+- **npm package** — install and run with `npx -y mcp-web-search-tool`; a
+  tag-triggered workflow publishes future releases through npm trusted
+  publishing.
+
+### Changed
+- **MCP TypeScript SDK v2** — the server now uses `@modelcontextprotocol/server`
+  and `serveStdio`, which serves both 2025-era clients and the 2026-07-28
+  protocol revision on the same stdio connection. Tools, arguments, and
+  response shapes are unchanged.
+- **Dependencies** updated to current releases (dotenv 18, vitest 5, ESLint
+  10.12, typescript-eslint 8.71, Prettier 3.9). TypeScript stays on 6.0 until
+  typescript-eslint supports 7.
+- **Docker image** now builds on `node:24-alpine`.
+- **CI** tests on Node 22 and 24 with lint, format check, type check, build,
+  and tests; the Docker build runs only when image inputs change. Dependabot
+  opens one grouped PR per ecosystem each month.
+
+### Fixed
+- `npm run lint` now covers every file under `src/`, not only the top level.
+- The `bin` path in `package.json` is normalized so npm keeps the
+  `mcp-web-search` executable when packing.
+
 ## [2.0.0] — 2026-04-29
 
 A ground-up overhaul that turns the original single-purpose Brave wrapper into a

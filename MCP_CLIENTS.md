@@ -3,6 +3,11 @@
 Copy-paste configurations for the most common MCP clients. The server speaks
 **stdio** only — there is no HTTP transport (yet).
 
+> Using the npm package instead of a clone? In any config below, replace
+> `"command": "node"` and the `build/index.js` path with `"command": "npx"`
+> and `"args": ["-y", "mcp-web-search-tool"]` (for Claude Code:
+> `-- npx -y mcp-web-search-tool`).
+>
 > Replace `/abs/path/to/mcp-web-search-tool` with the directory you cloned
 > the repo into, and `your_brave_api_key_here` with a real key. The
 > `BRAVE_API_KEY` env var is **optional**: when it is omitted the server
