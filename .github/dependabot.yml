@@ -5,6 +5,10 @@ updates:
     schedule:
       interval: 'monthly'
     open-pull-requests-limit: 5
+    ignore:
+      # typescript-eslint supports TypeScript < 6.1; lift once it supports 7.
+      - dependency-name: 'typescript'
+        versions: ['>=7']
     groups:
       npm:
         applies-to: version-updates
@@ -19,12 +23,4 @@ updates:
       interval: 'monthly'
     groups:
       github-actions:
-        patterns: ['*']
-
-  - package-ecosystem: 'docker'
-    directory: '/'
-    schedule:
-      interval: 'monthly'
-    groups:
-      docker:
         patterns: ['*']
