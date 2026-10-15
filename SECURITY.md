@@ -85,9 +85,9 @@ rule.
 ## Supply chain
 
 - The runtime dependency surface is intentionally minimal:
-  `@modelcontextprotocol/sdk` and `dotenv`. Everything else (HTML extraction,
+  `@modelcontextprotocol/server` and `dotenv`. Everything else (HTML extraction,
   retry, cache, ID minting, SSRF guard) is in-tree.
-- The Docker image runs as the non-root `node` user out of `node:20-alpine`.
+- The Docker image runs as the non-root `node` user out of `node:24-alpine`.
 - A `package-lock.json` is committed; CI uses `npm ci`.
 
 ## Reporting a vulnerability

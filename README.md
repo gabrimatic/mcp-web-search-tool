@@ -160,13 +160,14 @@ Register it in `SearchProviderFactory.setupDefaults`. Result ids are minted auto
 
 ```bash
 npm run dev          # tsx watch mode
-npm test             # vitest (23 tests)
-npm run lint
+npm test             # vitest suite
+npm run lint         # eslint + prettier
+npm run typecheck    # tsc --noEmit
 npm run format
 npm run build
 ```
 
-CI runs on Node 20, 22, and 24, plus a Docker image build. Tests cover the LRU+TTL cache, HTML extractor, DuckDuckGo parser, search-service caching, HTTP retry/backoff, SSRF guard, domain match, and the result-id resolver.
+CI runs lint, format check, type check, build, and tests on Node 22 and 24; a Docker image build runs when the image inputs change. Tests cover the LRU+TTL cache, HTML extractor, DuckDuckGo parser, search-service caching, HTTP retry/backoff, SSRF guard, domain match, and the result-id resolver.
 
 ---
 
