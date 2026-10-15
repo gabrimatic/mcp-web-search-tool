@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- Calling an unknown tool now returns JSON-RPC error `-32602` (Invalid params),
+  as the MCP tools spec requires, instead of `-32601`.
+- The Codex snippet in `MCP_CLIENTS.md` uses the `[mcp_servers.<name>]` table
+  that Codex reads.
+- The npm publish workflow fails instead of skipping when the registry check
+  errors, the version is already published, or it runs from a non-tag ref, and
+  it runs the full CI gate before publishing with provenance.
+
 ## [2.1.0] — 2026-10-15
 
 ### Added

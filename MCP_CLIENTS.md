@@ -59,7 +59,7 @@ Verify with `/mcp` inside Claude Code.
 `~/.codex/config.toml`:
 
 ```toml
-[mcp.servers.web_search]
+[mcp_servers.web_search]
 command = "node"
 args = ["/abs/path/to/mcp-web-search-tool/build/index.js"]
 env = { BRAVE_API_KEY = "your_brave_api_key_here" }

@@ -282,14 +282,14 @@ async function callTool(request: CallToolRequest): Promise<CallToolResult> {
       case 'list_providers':
         return handleListProviders();
       default:
-        // Unknown tool is a protocol-level error per MCP spec.
-        throw new ProtocolError(ProtocolErrorCode.MethodNotFound, `Unknown tool: '${name}'`);
+        // Unknown tool is a protocol-level error (-32602) per the MCP tools spec.
+        throw new ProtocolError(ProtocolErrorCode.InvalidParams, `Unknown tool: '${name}'`);
     }
   } catch (error) {
     // Tool execution and validation failures are returned as `isError: true`
     // content so the model can self-correct, per the tools spec. Only true
     // protocol-level errors are re-thrown.
-    if (error instanceof ProtocolError && error.code === ProtocolErrorCode.MethodNotFound) {
+    if (error instanceof ProtocolError && error.code === ProtocolErrorCode.InvalidParams) {
       throw error;
     }
     const msg = error instanceof Error ? error.message : String(error);

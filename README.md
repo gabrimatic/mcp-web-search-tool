@@ -58,7 +58,7 @@ For Claude Desktop, Claude Code, Codex, VS Code, Cursor, or Windsurf integration
 
 ## Tools
 
-Each tool returns two content blocks: a Markdown rendering for the model and a fenced JSON block with the structured payload. Errors come back as `isError: true` content with an actionable message; only unknown-tool calls throw a protocol error.
+Search tools return an untrusted-content banner, a Markdown rendering for the model, and a fenced JSON block with the structured payload; `fetch_url` returns the readable page text plus a links block. Errors come back as `isError: true` content with an actionable message; only unknown-tool calls throw a protocol error.
 
 ### `web_search`
 
@@ -121,6 +121,7 @@ All configuration is environment-driven. Reference: [`.env.example`](./.env.exam
 | `CACHE_MAX_ENTRIES` / `CACHE_TTL_MS` | `256` / `300000` | Search cache. |
 | `FETCH_CACHE_MAX` / `FETCH_CACHE_TTL_MS` | `128` / `600000` | URL-fetch cache. |
 | `FETCH_TIMEOUT_MS` / `FETCH_MAX_BYTES` | `15000` / `2000000` | Per-request budget for `fetch_url`. |
+| `RESULT_ID_CACHE_MAX` / `RESULT_ID_TTL_MS` | `2000` / `3600000` | How many result ids `fetch_url` can resolve, and for how long. |
 
 ---
 
