@@ -1,16 +1,23 @@
 import js from '@eslint/js';
-import tseslint from '@typescript-eslint/eslint-plugin';
-import tsparser from '@typescript-eslint/parser';
-import prettier from 'eslint-plugin-prettier';
-import prettierConfig from 'eslint-config-prettier';
+import { defineConfig } from 'eslint/config';
+import tseslint from 'typescript-eslint';
+import prettierRecommended from 'eslint-plugin-prettier/recommended';
 
-export default [
-  js.configs.recommended,
-  prettierConfig,
+export default defineConfig(
+  {
+    ignores: [
+      'build/',
+      'coverage/',
+      'node_modules/',
+      'tests/',
+      'eslint.config.js',
+      'vitest.config.ts'
+    ]
+  },
   {
     files: ['src/**/*.ts'],
+    extends: [js.configs.recommended, tseslint.configs.recommended, prettierRecommended],
     languageOptions: {
-      parser: tsparser,
       ecmaVersion: 2022,
       sourceType: 'module',
       globals: {
@@ -24,26 +31,16 @@ export default [
         Response: 'readonly',
         fetch: 'readonly',
         setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-      },
-    },
-    plugins: {
-      '@typescript-eslint': tseslint,
-      prettier,
+        clearTimeout: 'readonly'
+      }
     },
     rules: {
-      ...tseslint.configs.recommended.rules,
-      'prettier/prettier': 'error',
       'no-console': ['warn', { allow: ['warn', 'error', 'debug'] }],
-      'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': [
         'error',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }
       ],
-      '@typescript-eslint/consistent-type-imports': 'warn',
-    },
-  },
-  {
-    ignores: ['build/', 'node_modules/', 'tests/', 'eslint.config.js', 'vitest.config.ts'],
-  },
-];
+      '@typescript-eslint/consistent-type-imports': 'warn'
+    }
+  }
+);

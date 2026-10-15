@@ -1,13 +1,11 @@
 #!/usr/bin/env node
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import type { CallToolRequest } from '@modelcontextprotocol/sdk/types.js';
-import {
-  CallToolRequestSchema,
-  ErrorCode,
-  ListToolsRequestSchema,
-  McpError
-} from '@modelcontextprotocol/sdk/types.js';
+import { ProtocolError, ProtocolErrorCode, Server } from '@modelcontextprotocol/server';
+import type {
+  CallToolRequest,
+  CallToolResult,
+  ListToolsResult
+} from '@modelcontextprotocol/server';
+import { serveStdio } from '@modelcontextprotocol/server/stdio';
 
 import { appConfig } from './config.js';
 import { SearchProviderFactory } from './providers/SearchProviderFactory.js';
@@ -155,12 +153,7 @@ function buildSearchContent(resp: SearchResponse) {
 /*                                 MCP server                                  */
 /* -------------------------------------------------------------------------- */
 
-const server = new Server(
-  { name: appConfig.server.name, version: appConfig.server.version },
-  { capabilities: { tools: {} } }
-);
-
-server.setRequestHandler(ListToolsRequestSchema, async () => {
+function listTools(): ListToolsResult {
   const providerEnum = PROVIDERS;
   return {
     tools: [
@@ -268,11 +261,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       }
     ]
   };
-});
+}
 
 /* ---------------------------- Tool dispatch ---------------------------- */
 
-server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest) => {
+async function callTool(request: CallToolRequest): Promise<CallToolResult> {
   const { name, arguments: rawArgs } = request.params;
   const args = (rawArgs ?? {}) as Record<string, unknown>;
 
@@ -290,13 +283,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest)
         return handleListProviders();
       default:
         // Unknown tool is a protocol-level error per MCP spec.
-        throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: '${name}'`);
+        throw new ProtocolError(ProtocolErrorCode.MethodNotFound, `Unknown tool: '${name}'`);
     }
   } catch (error) {
     // Tool execution and validation failures are returned as `isError: true`
     // content so the model can self-correct, per the tools spec. Only true
     // protocol-level errors are re-thrown.
-    if (error instanceof McpError && error.code === ErrorCode.MethodNotFound) {
+    if (error instanceof ProtocolError && error.code === ProtocolErrorCode.MethodNotFound) {
       throw error;
     }
     const msg = error instanceof Error ? error.message : String(error);
@@ -306,7 +299,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest)
       content: [{ type: 'text', text: `Error: ${msg}` }]
     };
   }
-});
+}
+
+/** Builds one server instance; serveStdio pins one per connection. */
+function createServer(): Server {
+  const server = new Server(
+    { name: appConfig.server.name, version: appConfig.server.version },
+    { capabilities: { tools: {} } }
+  );
+  server.setRequestHandler('tools/list', () => listTools());
+  server.setRequestHandler('tools/call', request => callTool(request));
+  return server;
+}
 
 async function handleSearch(args: Record<string, unknown>, kind: 'web' | 'news' | 'images') {
   const term = args.search_term;
@@ -472,6 +476,7 @@ function asStringArray(v: unknown): string[] | undefined {
 
 /* -------------------------------- Boot --------------------------------- */
 
-const transport = new StdioServerTransport();
-await server.connect(transport);
+serveStdio(createServer, {
+  onerror: error => log(`transport error: ${error.message}`)
+});
 log('MCP web search server ready and listening on stdio');

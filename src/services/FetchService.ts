@@ -1,4 +1,4 @@
-import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
+import { ProtocolError, ProtocolErrorCode } from '@modelcontextprotocol/server';
 import { promises as dns } from 'dns';
 import { isIP } from 'net';
 import { httpFetch } from '../utils/http.js';
@@ -68,16 +68,16 @@ export class FetchService {
           const location = res.headers.get('location');
           if (!location) break;
           if (hop === MAX_REDIRECTS) {
-            throw new McpError(
-              ErrorCode.InternalError,
+            throw new ProtocolError(
+              ProtocolErrorCode.InternalError,
               `Too many redirects while fetching ${initial.toString()}`
             );
           }
           await res.body?.cancel().catch(() => undefined);
           current = new URL(location, current);
           if (current.protocol !== 'http:' && current.protocol !== 'https:') {
-            throw new McpError(
-              ErrorCode.InvalidRequest,
+            throw new ProtocolError(
+              ProtocolErrorCode.InvalidRequest,
               `Refusing to follow non-http(s) redirect to ${current.protocol}`
             );
           }
@@ -86,7 +86,7 @@ export class FetchService {
         break;
       }
 
-      if (!res) throw new McpError(ErrorCode.InternalError, 'No response received');
+      if (!res) throw new ProtocolError(ProtocolErrorCode.InternalError, 'No response received');
 
       const contentType = res.headers.get('content-type') ?? '';
       const buf = await readBodyCapped(res, maxBytes);
@@ -128,9 +128,9 @@ export class FetchService {
       cache.set(key, doc);
       return doc;
     } catch (error) {
-      if (error instanceof McpError) throw error;
+      if (error instanceof ProtocolError) throw error;
       const message = error instanceof Error ? error.message : String(error);
-      throw new McpError(ErrorCode.InternalError, `URL fetch failed: ${message}`);
+      throw new ProtocolError(ProtocolErrorCode.InternalError, `URL fetch failed: ${message}`);
     }
   }
 }
@@ -144,11 +144,11 @@ function parseAndCheckScheme(rawUrl: string): URL {
   try {
     parsed = new URL(rawUrl);
   } catch {
-    throw new McpError(ErrorCode.InvalidRequest, `Invalid URL: ${rawUrl}`);
+    throw new ProtocolError(ProtocolErrorCode.InvalidRequest, `Invalid URL: ${rawUrl}`);
   }
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-    throw new McpError(
-      ErrorCode.InvalidRequest,
+    throw new ProtocolError(
+      ProtocolErrorCode.InvalidRequest,
       `Only http/https URLs are allowed (got ${parsed.protocol})`
     );
   }
@@ -165,13 +165,19 @@ async function assertPublicHost(hostname: string): Promise<void> {
   const lower = stripped.toLowerCase();
 
   if (lower === 'localhost' || lower.endsWith('.local') || lower.endsWith('.internal')) {
-    throw new McpError(ErrorCode.InvalidRequest, `Refusing to fetch internal host: ${hostname}`);
+    throw new ProtocolError(
+      ProtocolErrorCode.InvalidRequest,
+      `Refusing to fetch internal host: ${hostname}`
+    );
   }
 
   const literal = ipFromLiteral(stripped);
   if (literal) {
     if (isPrivateIp(literal)) {
-      throw new McpError(ErrorCode.InvalidRequest, `Refusing to fetch private host: ${hostname}`);
+      throw new ProtocolError(
+        ProtocolErrorCode.InvalidRequest,
+        `Refusing to fetch private host: ${hostname}`
+      );
     }
     return;
   }
@@ -181,15 +187,15 @@ async function assertPublicHost(hostname: string): Promise<void> {
     const records = await dns.lookup(stripped, { all: true, verbatim: true });
     addrs = records.map(r => r.address);
   } catch (err) {
-    throw new McpError(
-      ErrorCode.InvalidRequest,
+    throw new ProtocolError(
+      ProtocolErrorCode.InvalidRequest,
       `Cannot resolve host '${hostname}': ${(err as Error).message}`
     );
   }
   for (const addr of addrs) {
     if (isPrivateIp(addr)) {
-      throw new McpError(
-        ErrorCode.InvalidRequest,
+      throw new ProtocolError(
+        ProtocolErrorCode.InvalidRequest,
         `Refusing to fetch private host: ${hostname} → ${addr}`
       );
     }

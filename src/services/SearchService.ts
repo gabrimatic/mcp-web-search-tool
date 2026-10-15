@@ -1,4 +1,4 @@
-import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
+import { ProtocolError, ProtocolErrorCode } from '@modelcontextprotocol/server';
 import { SearchProviderFactory } from '../providers/SearchProviderFactory.js';
 import type { SearchOptions, SearchResponse } from '../providers/SearchProvider.js';
 import { LruCache } from '../utils/cache.js';
@@ -56,8 +56,8 @@ export class SearchService {
   }
 
   private static handleError(error: unknown): never {
-    if (error instanceof McpError) throw error;
+    if (error instanceof ProtocolError) throw error;
     const message = error instanceof Error ? error.message : String(error);
-    throw new McpError(ErrorCode.InternalError, `Search failed: ${message}`);
+    throw new ProtocolError(ProtocolErrorCode.InternalError, `Search failed: ${message}`);
   }
 }

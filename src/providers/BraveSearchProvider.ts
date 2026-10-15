@@ -96,9 +96,7 @@ export class BraveSearchProvider extends SearchProvider {
     }
 
     const json = (await res.json()) as
-      | BraveWebApiResponse
-      | BraveNewsApiResponse
-      | BraveImageApiResponse;
+      BraveWebApiResponse | BraveNewsApiResponse | BraveImageApiResponse;
 
     const out = this.emptyResponse(query, kind);
     out.query = (json as BraveWebApiResponse).query?.original ?? query;
