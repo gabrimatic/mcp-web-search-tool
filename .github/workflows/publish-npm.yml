@@ -31,29 +31,25 @@ jobs:
           package-manager-cache: false
 
       - name: Check tag matches package version
-        if: startsWith(github.ref, 'refs/tags/v')
         run: |
+          case "$GITHUB_REF" in
+            refs/tags/v*) ;;
+            *) echo "::error::Publishing runs only from a v* tag (got $GITHUB_REF)."; exit 1 ;;
+          esac
           node -e "const tag = process.env.GITHUB_REF_NAME.replace(/^v/, ''); const v = require('./package.json').version; if (v !== tag) { console.error('Tag v' + tag + ' does not match package version ' + v); process.exit(1); }"
 
-      - name: Decide whether to publish
-        id: gate
+      - name: Check version is not already published
         run: |
-          name=$(node -p "require('./package.json').name")
-          version=$(node -p "require('./package.json').version")
-          if ! npm view "$name" name >/dev/null 2>&1; then
-            echo "::notice::$name is not on npm yet. Trusted publishing needs an existing package: publish the first version manually, then run npm trust."
-            echo "publish=false" >> "$GITHUB_OUTPUT"
-          elif npm view "$name@$version" version >/dev/null 2>&1; then
-            echo "::notice::$name@$version is already published."
-            echo "publish=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "publish=true" >> "$GITHUB_OUTPUT"
+          spec="$(node -p "require('./package.json').name")@$(node -p "require('./package.json').version")"
+          if npm view "$spec" version >/dev/null 2>&1; then
+            echo "::error::$spec is already on npm. Published versions are immutable: bump the version and tag again."
+            exit 1
           fi
 
-      - if: steps.gate.outputs.publish == 'true'
-        run: npm ci
-      - if: steps.gate.outputs.publish == 'true'
-        run: npm test
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm test
       - name: Publish package
-        if: steps.gate.outputs.publish == 'true'
-        run: npm publish --access public
+        run: npm publish --access public --provenance
