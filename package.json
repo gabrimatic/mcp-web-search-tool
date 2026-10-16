@@ -1,6 +1,6 @@
 {
   "name": "mcp-web-search-tool",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "MCP Web Search Tool — Model Context Protocol server providing real-time web search, news, image search, and URL content extraction with pluggable providers (Brave, DuckDuckGo).",
   "private": false,
   "type": "module",

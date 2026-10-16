@@ -6,6 +6,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-10-16
+
 ### Fixed
 - Calling an unknown tool now returns JSON-RPC error `-32602` (Invalid params),
   as the MCP tools spec requires, instead of `-32601`.
